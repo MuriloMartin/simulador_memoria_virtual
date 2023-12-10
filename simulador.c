@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_MEMORY_SIZE 4 * 1024 * 1024 // 4MB
 #define MAX_PAGE_SIZE 16 * 1024 // 16KB
@@ -45,41 +46,19 @@ int main(int argc, char *argv[]) {
     verifica_limites(page_size, total_memory);
     
     prtint_parameters(algorithm, log_file, page_size, total_memory);
-    
-    FILE *fileCompilador = fopen("GM-INF1316-Todos-Arquivos/compilador/compilador.log", "r");
-    verifica_arquivo(fileCompilador);
-    FILE *fileCompressor = fopen("GM-INF1316-Todos-Arquivos/compressor/compressor.log", "r");
-    verifica_arquivo(fileCompressor);
-    FILE *fileMatriz = fopen("GM-INF1316-Todos-Arquivos/matriz/matriz.log", "r");
-    verifica_arquivo(fileMatriz);
-    FILE *fileSimulador = fopen("GM-INF1316-Todos-Arquivos/simulador/simulador.log", "r");
-    verifica_arquivo(fileSimulador);
-    
-
+    FILE *file = fopen(log_file, "r");
+    verifica_arquivo(file);
 
     unsigned int addr;
     char rw;
 
     //Ler os 4 arquivos em paralelo ou sequencial???
-    while (fscanf(fileCompilador, "%x %c", &addr, &rw) == 2) {
+    while (fscanf(file, "%x %c", &addr, &rw) == 2) {
         printf("Address: 0x%x, Read/Write: %c\n", addr, rw);
     }
 
     // Close the file
-    fclose(fileCompilador);
-    fclose(fileCompressor);
-    fclose(fileMatriz);
-    fclose(fileSimulador);
-
-   
-
-
-   
-
- 
-
-   
-
+    fclose(file);
 
     return 0;
 }
