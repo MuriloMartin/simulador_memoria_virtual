@@ -84,7 +84,7 @@ void initializePageTable(PageTable *page_table, int num_frames)
         page_table->frames[i].page_index = -1;
         page_table->frames[i].referenced = false;
         page_table->frames[i].modified = false;
-        page_table->frames[i].lastAcess = 2;
+        page_table->frames[i].lastAcess = 0;
     }
 
     page_table->page_faults = 0;
@@ -96,7 +96,7 @@ void freePageTable(PageTable *page_table)
     free(page_table->frames);
 }
 
-bool validPageCheck(PageTable *page_table, int page_index, char operation, time_t time)
+bool validPageCheck(PageTable *page_table, unsigned int page_index, char operation, time_t time)
 {
 
     for (int i = 0; i < page_table->num_frames; i++)
@@ -134,9 +134,46 @@ int choosePageToReplace_LRU(PageTable *page_table)
     return chosen_index;
 }
 
+int choosePageToReplace_NRU(PageTable *page_table) {
+    for (int i = 0; i < page_table->num_frames; i++){
+        if (page_table->frames[i].referenced == false && page_table->frames[i].modified == false){
+            return i;
+        }
+    }
+
+    for (int i = 0; i < page_table->num_frames; i++){
+        if (page_table->frames[i].referenced == false && page_table->frames[i].modified == true){
+            return i;
+        }
+    }
+
+    for (int i = 0; i < page_table->num_frames; i++){
+        if (page_table->frames[i].referenced == true && page_table->frames[i].modified == false){
+            return i;
+        }
+    }
+
+    for (int i = 0; i < page_table->num_frames; i++){
+        if (page_table->frames[i].referenced == true && page_table->frames[i].modified == true){
+            return i;
+        }
+    }
+}
+void zeroReferenced(PageTable *page_table)
+{
+    for (int i = 0; i < page_table->num_frames; i++)
+    {
+        page_table->frames[i].referenced = false;
+    }
+}
 void handlePageAccess(PageTable *page_table, unsigned int logical_address, char operation, int shift, char *algorithm, int* time)
 {
     *time += 1;
+    if ((*time) % 5 == 0)
+    {
+        
+        zeroReferenced(page_table);
+    }
     unsigned int page_index = getIndex(logical_address, shift);
     bool page_found = validPageCheck(page_table, page_index, operation, *time);
 
@@ -163,14 +200,15 @@ void handlePageAccess(PageTable *page_table, unsigned int logical_address, char 
 
             if (strcmp(algorithm, "NRU") == 0)
             {
-                // printf("Algoritmo NRU será implementado agora:");
-                //   choosePageToReplace_NRU(page_table, logical_address, operation, shift);
+                index_replace = choosePageToReplace_NRU(page_table);
+                printf("Páginaaa substituída: %x\n", page_table->frames[index_replace].page_index);
+
             }
             else if (strcmp(algorithm, "LRU") == 0)
             {
 
                 index_replace = choosePageToReplace_LRU(page_table);
-                printf("Página substituída: %x\n", page_table->frames[index_replace].page_index);
+                printf("Páginabb substituída: %x\n", page_table->frames[index_replace].page_index);
             }
             else
             {
