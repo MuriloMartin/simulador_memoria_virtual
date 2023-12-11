@@ -41,7 +41,7 @@ void verifica_limites(int page_size, int total_memory)
     }
 }
 
-void prtint_parameters(char *algorithm, char *log_file, int page_size, int total_memory, int shift)
+void print_parameters(char *algorithm, char *log_file, int page_size, int total_memory, int shift)
 {
     printf("Algoritmo: %s\n", algorithm);
     printf("Arquivo de log: %s\n", log_file);
@@ -169,7 +169,7 @@ void zeroReferenced(PageTable *page_table)
 void handlePageAccess(PageTable *page_table, unsigned int logical_address, char operation, int shift, char *algorithm, int* time)
 {
     *time += 1;
-    if ((*time) % 5 == 0)
+    if ((*time) % 25000 == 0)
     {
         
         zeroReferenced(page_table);
@@ -201,14 +201,14 @@ void handlePageAccess(PageTable *page_table, unsigned int logical_address, char 
             if (strcmp(algorithm, "NRU") == 0)
             {
                 index_replace = choosePageToReplace_NRU(page_table);
-                printf("Páginaaa substituída: %x\n", page_table->frames[index_replace].page_index);
+                //printf("Páginaaa substituída: %x\n", page_table->frames[index_replace].page_index);
 
             }
             else if (strcmp(algorithm, "LRU") == 0)
             {
 
                 index_replace = choosePageToReplace_LRU(page_table);
-                printf("Páginabb substituída: %x\n", page_table->frames[index_replace].page_index);
+                //printf("Páginabb substituída: %x\n", page_table->frames[index_replace].page_index);
             }
             else
             {
@@ -235,8 +235,8 @@ int main(int argc, char *argv[])
     // Argumentos de linha de comando
     char *algorithm = argv[1];
     char *log_file = argv[2];
-    int page_size = atoi(argv[3]); //* 1024; // Convertendo para bytes
-    int total_memory = atoi(argv[4]); // * 1024 * 1024; // Convertendo para bytes
+    int page_size = atoi(argv[3])* 1024; // Convertendo para bytes
+    int total_memory = atoi(argv[4]) * 1024 * 1024; // Convertendo para bytes
     FILE **files = malloc(sizeof(FILE *) * 4);
     int shift = getShift(page_size);
     FILE *file = fopen(log_file, "r");
@@ -246,8 +246,8 @@ int main(int argc, char *argv[])
     PageTable page_table;
     int time = 0;
 
-    //verifica_limites(page_size, total_memory);
-    prtint_parameters(algorithm, log_file, page_size, total_memory, shift);
+    verifica_limites(page_size, total_memory);
+    print_parameters(algorithm, log_file, page_size, total_memory, shift);
     verifica_arquivo(file);
     initializePageTable(&page_table, num_frames);
 
